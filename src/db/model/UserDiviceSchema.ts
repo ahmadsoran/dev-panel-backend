@@ -11,6 +11,7 @@ const UserDivice = new Schema<UserDivice>(
     software_restrictions: {
       type: String,
       default: "lock",
+      enum: ["lock", "unloack"],
     },
     UUID: String,
   },

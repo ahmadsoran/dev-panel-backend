@@ -7,6 +7,7 @@ const Users = new Schema<User>(
     role: {
       type: String,
       default: "user",
+      enum: ["user", "dev", "tester"],
     },
     Device: {
       type: Schema.Types.ObjectId,

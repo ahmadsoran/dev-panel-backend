@@ -11,6 +11,7 @@ const UserErrors = new Schema<UserErrors>(
     priority: {
       type: String,
       default: "normal",
+      enum: ["normal", "urgent", "critical"],
     },
     status: String,
     times: Number,
