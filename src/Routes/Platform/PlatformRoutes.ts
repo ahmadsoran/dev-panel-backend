@@ -1,5 +1,5 @@
 import { Router } from "express";
-import AddPlatform from "../../controller/Platform/Add";
+import AddPlatform from "../../controller/Platform/AddPlatform";
 import GenApiKeyForPlatforms from "../../controller/Platform/Gen-apikey";
 import { isAdmin, isSuperAdmin } from "../../middlewears/Auth";
 
