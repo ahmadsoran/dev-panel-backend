@@ -86,19 +86,25 @@ export async function isApiKeyValid(
   res: Response,
   Next: NextFunction
 ) {
-  const ApiKey = req.headers.authorization;
+  const ApiKey = req.headers.apikey as string;
   const privateKey = process.env.PRV_KEY;
   if (!ApiKey) return res.status(400).send("provide api key");
   if (!privateKey)
     return res.status(500).send("something went wrong! try again later");
   try {
+    const ValidateApiKey = await PlatformsApiKeySchema.findOne({ ApiKey })
+      .lean()
+      .exec();
+    if (!ValidateApiKey) return res.status(404).send("No data found");
     const decodeApiKey = jwt.verify(ApiKey, privateKey) as decodeApikey;
-    const ValidateApiKey = await PlatformsApiKeySchema.findOne({
-      ApiKey: decodeApiKey?.apiKey,
-    });
-    if (!ValidateApiKey)
-      return res.status(401).send("unauthorized to do this action");
+    const decodePlatformApiKey = jwt.verify(
+      ValidateApiKey.ApiKey,
+      privateKey
+    ) as decodeApikey;
+    if (decodeApiKey.apiKey !== decodePlatformApiKey.apiKey)
+      return res.status(401).send("invalid api key");
 
+    req.platformID = ValidateApiKey.Platform;
     Next();
   } catch (error) {
     if (error instanceof Error) {
