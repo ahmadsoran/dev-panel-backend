@@ -9,7 +9,6 @@ export type PlatformOwner = {
 
 export default interface PlatformsType {
   name: string;
-  Users: [ObjectId];
   NumberOFusers: number;
   NumberOFerrors: number;
   numberOFcrashes: number;

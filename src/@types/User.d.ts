@@ -20,10 +20,13 @@ export type UserErrors = {
 };
 
 export type User = {
-  _id: string;
-  name: string;
   Device: UserDivice;
   Errors: UserErrors[];
   role: "user" | "dev" | "tester";
   cratedAt: Date;
+};
+export type platformUsers = {
+  _id: string;
+  platformID: ObjectId;
+  users: User[];
 };
