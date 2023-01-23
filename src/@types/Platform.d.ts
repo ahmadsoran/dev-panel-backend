@@ -16,7 +16,7 @@ export default interface PlatformsType {
   lastCrashReport: Date;
   lastErrorReport: Date;
   owner: PlatformOwner;
-  paltformType: "android" | "ios" | "Both";
+  platformType: "android" | "ios" | "Both";
   releaseVersion: string;
   isNewUpdateAvailable: boolean;
   build: PlatformBuild;
