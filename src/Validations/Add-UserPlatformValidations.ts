@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { User, UserDivice } from "../@types/User";
 
-const AddPlatformValidations = Joi.object<User>({
+const AddUserPlatformValidations = Joi.object<User>({
   Device: Joi.object<UserDivice>({
     brand: Joi.string().required(),
     CPU: Joi.string().required(),
@@ -9,15 +9,11 @@ const AddPlatformValidations = Joi.object<User>({
     model: Joi.string().required(),
     RAM: Joi.string().required(),
     software_restrictions: Joi.string()
-      .valid("loack", "unlock")
+      .valid("lock", "unloack" as UserDivice["software_restrictions"])
       .default("lock")
       .required(),
     UUID: Joi.string().uuid().required(),
   }).required(),
-  name: Joi.string().required(),
-  role: Joi.string()
-    .valid("user", "dev", "tester" as User["role"])
-    .required(),
 });
 
-export default AddPlatformValidations;
+export default AddUserPlatformValidations;

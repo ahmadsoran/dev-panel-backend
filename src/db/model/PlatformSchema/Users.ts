@@ -1,22 +1,39 @@
 import { model, Schema } from "mongoose";
-import { User } from "../../../@types/User";
+import { platformUsers } from "../../../@types/User";
 
-const Users = new Schema<User>(
+const Users = new Schema<platformUsers>(
   {
-    name: String,
-    role: {
-      type: String,
-      default: "user",
-      enum: ["user", "dev", "tester"],
-    },
-    Device: {
-      type: Schema.Types.ObjectId,
-      ref: "user-device",
-    },
-    Errors: {
-      types: [Schema.Types.ObjectId],
-      ref: "user-errors",
-    },
+    platformID: Schema.Types.ObjectId,
+    users: [
+      {
+        role: {
+          type: String,
+          default: "user",
+          enum: ["user", "dev", "tester"],
+        },
+        Device: {
+          brand: String,
+          CPU: String,
+          GPU: String,
+          model: String,
+          RAM: String,
+          software_restrictions: {
+            type: String,
+            default: "lock",
+            enum: ["lock", "unloack"],
+          },
+          UUID: {
+            type: String,
+          },
+        },
+        Errors: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: "user-errors",
+          },
+        ],
+      },
+    ],
   },
   { timestamps: true }
 );
