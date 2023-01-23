@@ -5,24 +5,30 @@ import PlatformsApiKeySchema from "../../db/model/PlatformSchema/Apikey";
 import GenApikeyValidation from "../../Validations/Gen-apikey";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
+import jwt from "jsonwebtoken";
 export default async function GenApiKeyForPlatforms(
   req: Request,
   res: Response
 ) {
   const { platformID, AdminPassword } = req.body;
+  const privateKey = process.env.PRV_KEY;
+  if (!privateKey)
+    return res.status(500).send("something went wrong! try again later");
   try {
     try {
       await GenApikeyValidation.validateAsync({ Platform: platformID });
     } catch (error) {
       if (error instanceof Error) return res.status(400).send(error.message);
     }
-    const PlatformData = await PlatformsApiKeySchema.findOne({
-      platform: platformID,
-    });
+    const PlatformData = await PlatformsApiKeySchema.findOne()
+      .where("Platform")
+      .equals(platformID);
+    console.log(platformID, PlatformData);
+    const ApiKeyEnc = jwt.sign({ apikey: randomUUID() }, privateKey);
     if (!PlatformData) {
       await new PlatformsApiKeySchema({
         Platform: platformID,
-        ApiKey: randomUUID(),
+        ApiKey: ApiKeyEnc,
       }).save();
       return res.json({ patform: "platform api key created successfuly" });
     } else {
@@ -35,14 +41,14 @@ export default async function GenApiKeyForPlatforms(
         });
       }
       if (!AdminPassword && !PlatformData?.ApiKey) {
-        PlatformData!.ApiKey = randomUUID();
+        PlatformData!.ApiKey = ApiKeyEnc;
         PlatformData!.save();
         return res.json({
           data: `Platform with id: ${platformID} api key has been added successfuly`,
         });
       }
       if (AdminPassword && PlatformData?.ApiKey) {
-        const AdminUser = await AdminAccountSchema.findById(req.AdminID)
+        const AdminUser = await AdminAccountSchema.findById(req?.AdminID)
           .lean()
           .exec();
         if (!AdminUser) return res.status(404).send("user not found!");
@@ -54,7 +60,7 @@ export default async function GenApiKeyForPlatforms(
           return res.status(400).send("invaild password");
         }
 
-        PlatformData!.ApiKey = randomUUID();
+        PlatformData!.ApiKey = ApiKeyEnc;
         PlatformData!.save();
         return res.json({
           data: `Platform with id: ${platformID} api key has been updated successfuly`,
