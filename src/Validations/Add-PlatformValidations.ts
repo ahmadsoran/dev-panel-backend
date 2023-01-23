@@ -8,7 +8,9 @@ const AddPlatformValidations = Joi.object<PlatformsType>({
     email: Joi.string().email().required(),
     phone_number: Joi.string().min(7),
   }).required(),
-  platformType: Joi.string().valid("android", "ios", "Both").required(),
+  platformType: Joi.string()
+    .valid("android", "ios", "Both" as PlatformsType["platformType"])
+    .required(),
   releaseVersion: Joi.string().required(),
 });
 
