@@ -8,6 +8,7 @@ export type PlatformOwner = {
 };
 
 export default interface PlatformsType {
+  _id: string;
   name: string;
   NumberOFusers: number;
   NumberOFerrors: number;

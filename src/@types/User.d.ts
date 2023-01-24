@@ -11,6 +11,7 @@ export type UserDivice = {
 };
 
 export type UserErrors = {
+  _id: string;
   times: number;
   priority: "normal" | "urgent" | "critical";
   cause: string;
@@ -20,13 +21,10 @@ export type UserErrors = {
 };
 
 export type User = {
+  _id: string;
   Device: UserDivice;
   Errors: UserErrors[];
   role: "user" | "dev" | "tester";
   cratedAt: Date;
-};
-export type platformUsers = {
-  _id: string;
-  platformID: ObjectId;
-  users: User[];
+  platform: ObjectId;
 };
