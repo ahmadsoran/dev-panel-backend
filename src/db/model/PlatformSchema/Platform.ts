@@ -19,10 +19,6 @@ const Platforms = new Schema<PlatformsType>(
       default: "Both",
       enum: ["Both", "ios", "android"],
     },
-    Users: {
-      type: [Schema.Types.ObjectId],
-      ref: "user",
-    },
     build: {
       type: Schema.Types.ObjectId,
       ref: "builds",
