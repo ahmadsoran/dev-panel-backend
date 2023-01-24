@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import winston from "winston";
-// import PlatformSchema from "../../db/model/PlatformSchema/Platform";
 import UsersSchema from "../../db/model/PlatformSchema/Users";
 import AddUserPlatformValidations from "../../Validations/Add-UserPlatformValidations";
 
@@ -14,32 +13,18 @@ export default async function AddUser(req: Request, res: Response) {
       if (error instanceof Error) return res.status(400).send(error.message);
     }
 
-    const User = await UsersSchema.findOne({ platformID });
-    if (!User) {
-      await new UsersSchema({
-        platformID,
-        users: { Device: Device },
-      }).save();
-      return res.json({ platform: "Platform user created successfully" });
-    }
-    const CheckForOldReg = await UsersSchema.findOne({ platformID })
-      .where("users.Device.UUID")
+    const User = UsersSchema.find({ platform: platformID });
+
+    const checkForOldReg = await User.where("Device.UUID")
       .equals(Device.UUID)
       .lean()
       .exec();
-    console.log(CheckForOldReg);
-    if (!CheckForOldReg) {
-      await UsersSchema.findOneAndUpdate(
-        { platformID },
-        {
-          $push: {
-            users: { Device },
-          },
-        }
-      );
-      return res.json({
-        platform: `Device ${Device.brand} added successfully`,
-      });
+    if (checkForOldReg.length === 0) {
+      await new UsersSchema({
+        Device,
+        platform: platformID,
+      }).save();
+      return res.json({ platform: "Platform user created successfully" });
     } else {
       return res.status(400).send("device exist");
     }
