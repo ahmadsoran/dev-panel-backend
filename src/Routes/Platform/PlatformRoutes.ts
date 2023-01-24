@@ -1,4 +1,5 @@
 import { Router } from "express";
+import addUserErrors from "../../controller/Platform/AddErrors";
 import AddPlatform from "../../controller/Platform/AddPlatform";
 import AddUser from "../../controller/Platform/AddUser";
 import GenApiKeyForPlatforms from "../../controller/Platform/Gen-apikey";
@@ -17,5 +18,6 @@ PlatformRoutes.get("/id/:id", isAdmin, GetPlatformByID, GetUsersOfPlatform);
 PlatformRoutes.post("/add", isAdmin, AddPlatform);
 PlatformRoutes.post("/gen-apikey", isSuperAdmin, GenApiKeyForPlatforms);
 PlatformRoutes.post("/user/add", isApiKeyValid, AddUser);
+PlatformRoutes.post("/user/errors/add", isApiKeyValid, addUserErrors);
 
 export default PlatformRoutes;
