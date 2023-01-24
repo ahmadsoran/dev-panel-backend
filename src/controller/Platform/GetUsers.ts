@@ -18,7 +18,7 @@ export async function GetUsersOfPlatform(req: Request, res: Response) {
 
   if (!req.platfomData._id) return res.status(400).send("invaild platform id");
   const resultsPerPage =
-    parseInt(row as string) >= 1 ? parseInt(row as string) : 25;
+    parseInt(row as string) >= 1 ? parseInt(row as string) : 1;
   let pages = parseInt(page as string) >= 1 ? parseInt(page as string) - 1 : 0;
 
   const isSearchFilterAvailable = search && searchBy ? true : false;
@@ -74,8 +74,12 @@ export async function GetUsersOfPlatform(req: Request, res: Response) {
       })
       .slice(pages * resultsPerPage, pages * resultsPerPage + resultsPerPage);
     return res.json({
+      totalUsers: users.length,
       platform: req.platfomData,
-      users: FilterUsers,
+      users: {
+        resault: FilterUsers.length,
+        data: FilterUsers,
+      },
     });
   } catch (error) {
     if (error instanceof Error) {
