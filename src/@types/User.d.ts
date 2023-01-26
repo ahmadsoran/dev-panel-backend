@@ -8,6 +8,7 @@ export type UserDivice = {
   GPU: string;
   UUID: string;
   software_restrictions: "lock" | "unloack";
+  version: string;
 };
 
 export type UserErrors = {
