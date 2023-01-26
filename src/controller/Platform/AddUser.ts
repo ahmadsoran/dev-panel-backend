@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import winston from "winston";
 import UsersSchema from "../../db/model/PlatformSchema/Users";
-import AddUserPlatformValidations from "../../Validations/Add-UserPlatformValidations";
+import AddUserValidations from "../../Validations/Add-UserValidations";
 
 export default async function AddUser(req: Request, res: Response) {
   const { Device } = req.body;
   const platformID = req.platformID;
   try {
     try {
-      await AddUserPlatformValidations.validateAsync({ Device });
+      await AddUserValidations.validateAsync({ Device });
     } catch (error) {
       if (error instanceof Error) return res.status(400).send(error.message);
     }
