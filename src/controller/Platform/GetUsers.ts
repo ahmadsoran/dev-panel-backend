@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import winston from "winston";
-import { UserErrors } from "../../@types/User";
+import { User, UserErrors } from "../../@types/User";
 import UsersSchema from "../../db/model/PlatformSchema/Users";
 type Queries = {
   page: string;
@@ -10,11 +10,20 @@ type Queries = {
   errorsPriority: UserErrors["priority"];
   errorsType: UserErrors["status"];
   searchBy: "model" | "UUID" | "brand";
+  role: User["role"];
 };
 
 export async function GetUsersOfPlatform(req: Request, res: Response) {
-  const { page, row, search, date, errorsPriority, errorsType, searchBy } =
-    req.query as Queries;
+  const {
+    page,
+    row,
+    search,
+    date,
+    errorsPriority,
+    errorsType,
+    searchBy,
+    role,
+  } = req.query as Queries;
 
   if (!req.platfomData._id) return res.status(400).send("invaild platform id");
   const resultsPerPage =
@@ -22,9 +31,11 @@ export async function GetUsersOfPlatform(req: Request, res: Response) {
   let pages = parseInt(page as string) >= 1 ? parseInt(page as string) - 1 : 0;
 
   const isSearchFilterAvailable = search && searchBy ? true : false;
+
   try {
     const users = await UsersSchema.find({
       platform: req.platfomData._id,
+      role: role ? role : "user",
     })
       .populate({
         path: "Errors",
@@ -74,7 +85,7 @@ export async function GetUsersOfPlatform(req: Request, res: Response) {
       })
       .slice(pages * resultsPerPage, pages * resultsPerPage + resultsPerPage);
     return res.json({
-      totalUsers: users.length,
+      total_users_num: users.length,
       platform: req.platfomData,
       users: {
         resault: FilterUsers.length,
