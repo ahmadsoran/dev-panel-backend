@@ -20,6 +20,7 @@ const Users = new Schema<User>(
         enum: ["lock", "unloack"],
       },
       UUID: String,
+      version: String,
     },
     Errors: [
       {

@@ -11,7 +11,7 @@ import { GetUsersOfPlatform } from "../../controller/Platform/GetUsers";
 import { isAdmin, isApiKeyValid, isSuperAdmin } from "../../middlewears/Auth";
 
 const PlatformRoutes = Router();
-// full path /api/API_VERSION/platform/*
+// full path /api/{API_VERSION}/platform/{ROUTE}
 
 PlatformRoutes.get("/", isAdmin, GetPlatforms);
 PlatformRoutes.get("/id/:id", isAdmin, GetPlatformByID, GetUsersOfPlatform);
