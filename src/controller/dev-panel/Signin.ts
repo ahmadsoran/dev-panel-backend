@@ -3,7 +3,7 @@ import SignInDataValidation from "../../Validations/SignIn";
 import bcrypt from "bcrypt";
 import AdminAccountSchema from "../../db/model/Dev-PanelSchema/AdminAccountSchema";
 import jwt from "jsonwebtoken";
-import dayjs from "dayjs";
+import cookie from "cookie";
 import winston from "winston";
 
 export default async function SiginIn(req: Request, res: Response) {
@@ -13,7 +13,7 @@ export default async function SiginIn(req: Request, res: Response) {
     try {
       await SignInDataValidation.validateAsync({ username, password });
     } catch (error) {
-      if (error instanceof Error) return res.status(400).json(error.message);
+      if (error instanceof Error) return res.status(400).json({error: error.message});
     }
     ///
     const AdminData = await AdminAccountSchema.findOne({
@@ -22,30 +22,39 @@ export default async function SiginIn(req: Request, res: Response) {
       .lean()
       .exec();
     ///
-    if (!AdminData) return res.status(404).send("User not found!");
+    if (!AdminData) return res.status(404).json({ error: "User not found!" });
     const isPasswordVaild = await bcrypt.compare(password, AdminData?.password);
     ///
     if (!isPasswordVaild)
-      return res.status(400).send("password or username invaild");
-    if (!prvKey) return res.status(500).send("something went wrong!");
+      return res.status(400).json({ error: "password or username invaild" });
+    if (!prvKey)
+      return res.status(500).json({ error: "something went wrong!" });
 
     const token = jwt.sign({ id: AdminData?._id.toString() }, prvKey, {
       expiresIn: "10h",
     });
-    res.cookie("token", token, {
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true,
-      expires: dayjs(Date.now()).add(10, "h").toDate(),
-    });
 
-    return res.json("Signed in");
+    res.setHeader(
+      "Set-Cookie",
+      cookie.serialize("token", token, {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        maxAge: 60 * 60 * 10,
+        sameSite: "strict",
+        path: "/",
+      })
+    );
+
+    return res.json({
+      token,
+      status: "success",
+      data: `welcome back ${AdminData.name}`,
+    });
   } catch (error) {
     if (error instanceof Error) {
       winston.error(`error while user try sign-in msg:${error.message}`);
       console.log(error);
-      return res
-        .status(500)
-        .send("unkown error happen while sgin in try again");
+      return res.status(500).json({ error: "unkown error" });
     }
   }
 }

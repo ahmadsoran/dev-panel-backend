@@ -25,7 +25,8 @@ export async function GetUsersOfPlatform(req: Request, res: Response) {
     role,
   } = req.query as Queries;
 
-  if (!req.platfomData._id) return res.status(400).send("invaild platform id");
+  if (!req.platfomData._id)
+    return res.status(400).json({ error: "invaild platform id" });
   const resultsPerPage =
     parseInt(row as string) >= 1 ? parseInt(row as string) : 1;
   let pages = parseInt(page as string) >= 1 ? parseInt(page as string) - 1 : 0;
@@ -95,24 +96,7 @@ export async function GetUsersOfPlatform(req: Request, res: Response) {
   } catch (error) {
     if (error instanceof Error) {
       winston.error(`error while geting users data msg: ${error.message}`);
-      return res.status(500).send("unkown error happen" + error);
+      return res.status(500).json({ error: "unkown error happen" });
     }
   }
 }
-
-// export async function GetPlatformByID(req: Request, res: Response) {
-//   const { id } = req.params;
-//   if (!id) return res.status(400).send("id must require");
-//   try {
-//     const platform = await UsersSchema.findById(id);
-//     if (!platform) return res.status(404).send("no data found!");
-//     return res.json({
-//       platform,
-//     });
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       winston.error(`error while geting users data msg: ${error.message}`);
-//       return res.status(500).send("unkown error happen");
-//     }
-//   }
-// }

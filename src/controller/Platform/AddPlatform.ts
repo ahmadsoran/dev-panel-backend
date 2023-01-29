@@ -28,7 +28,8 @@ export default async function AddPlatform(req: Request, res: Response) {
         platformType,
       });
     } catch (error) {
-      if (error instanceof Error) return res.status(400).send(error.message);
+      if (error instanceof Error)
+        return res.status(400).json({ error: error.message });
     }
     const addPlatform = await new PlatformSchema({
       name,
@@ -47,7 +48,9 @@ export default async function AddPlatform(req: Request, res: Response) {
       winston.error(`error while adding Platform msg: ${error.message}`);
       return res
         .status(isDuplicateErr ? 400 : 500)
-        .send(isDuplicateErr ? "This Platform exist" : "unkown error happen");
+        .json({
+          error: isDuplicateErr ? "This Platform exist" : "unkown error happen",
+        });
     }
   }
 }

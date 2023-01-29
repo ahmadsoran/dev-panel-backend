@@ -10,7 +10,8 @@ export default async function AddUser(req: Request, res: Response) {
     try {
       await AddUserValidations.validateAsync({ Device });
     } catch (error) {
-      if (error instanceof Error) return res.status(400).send(error.message);
+      if (error instanceof Error)
+        return res.status(400).json({ error: error.message });
     }
 
     const User = UsersSchema.find({ platform: platformID });
@@ -26,7 +27,7 @@ export default async function AddUser(req: Request, res: Response) {
       }).save();
       return res.json({ platform: "Platform user created successfully" });
     } else {
-      return res.status(400).send("device exist");
+      return res.status(400).json({ error: "device exist" });
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -36,13 +37,11 @@ export default async function AddUser(req: Request, res: Response) {
           `error while adding user to platform msg: ${error.message}`
         );
       }
-      return res
-        .status(isDuplicateErr ? 400 : 500)
-        .send(
-          isDuplicateErr
-            ? "this device already registerd"
-            : "unkown error happend" + error.message
-        );
+      return res.status(isDuplicateErr ? 400 : 500).json({
+        error: isDuplicateErr
+          ? "this device already registerd"
+          : "unkown error happend" + error.message,
+      });
     }
   }
 }

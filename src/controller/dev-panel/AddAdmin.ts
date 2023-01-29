@@ -15,14 +15,15 @@ export default async function AddAdminUser(req: Request, res: Response) {
         password,
       });
     } catch (error) {
-      if (error instanceof Error) return res.status(400).send(error.message);
+      if (error instanceof Error)
+        return res.status(400).json({ error: error.message });
     }
     const GenSalt = await genSalt(saltRound, "a");
     const isUsernameAvailable = await AdminAccountSchema.findOne({ username })
       .lean()
       .exec();
     if (isUsernameAvailable)
-      return res.status(400).send("this username is taken");
+      return res.status(400).json({ error: "this username is taken" });
     const HashedPassword = await hash(password, GenSalt);
     const createAdminUser = new AdminAccountSchema({
       name,
@@ -37,7 +38,7 @@ export default async function AddAdminUser(req: Request, res: Response) {
   } catch (error) {
     if (error instanceof Error) {
       winston.error(`error while adding use msg: ${error.message}`);
-      return res.status(500).send("unknown error happened");
+      return res.status(500).json({ error: "unknown error happened" });
     }
   }
 }

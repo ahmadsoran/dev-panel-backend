@@ -18,7 +18,7 @@ StartServer();
 async function StartServer() {
   ConnectDB();
   app.use(helmet());
-  app.use(cors());
+  app.use(cors({ credentials: true, origin: ["http://localhost:3000"] }));
   app.use(cookieParser());
   app.use(`${Api.RootRoute}/${Api.Version}`, Routes);
   app.use("/data", express.static(`${__dirname}/public`));

@@ -13,12 +13,15 @@ export default async function GenApiKeyForPlatforms(
   const { platformID, AdminPassword } = req.body;
   const privateKey = process.env.PRV_KEY;
   if (!privateKey)
-    return res.status(500).send("something went wrong! try again later");
+    return res
+      .status(500)
+      .json({ error: "something went wrong! try again later" });
   try {
     try {
       await GenApikeyValidation.validateAsync({ Platform: platformID });
     } catch (error) {
-      if (error instanceof Error) return res.status(400).send(error.message);
+      if (error instanceof Error)
+        return res.status(400).json({ error: error.message });
     }
     const PlatformData = await PlatformsApiKeySchema.findOne()
       .where("Platform")
@@ -51,13 +54,14 @@ export default async function GenApiKeyForPlatforms(
         const AdminUser = await AdminAccountSchema.findById(req?.AdminID)
           .lean()
           .exec();
-        if (!AdminUser) return res.status(404).send("user not found!");
+        if (!AdminUser)
+          return res.status(404).json({ error: "user not found!" });
         const comparePasswordWithHash = bcrypt.compare(
           AdminPassword,
           AdminUser?.password
         );
         if (!comparePasswordWithHash) {
-          return res.status(400).send("invaild password");
+          return res.status(400).json({ error: "invaild password" });
         }
 
         PlatformData!.ApiKey = ApiKeyEnc;
@@ -72,7 +76,7 @@ export default async function GenApiKeyForPlatforms(
       winston.error(
         `error while genarate api key for platform msg: ${error.message}`
       );
-      return res.status(500).send("unkown error happend");
+      return res.status(500).json({ error: "unkown error happend" });
     }
   }
 }
